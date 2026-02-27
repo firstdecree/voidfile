@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoidFile</title>
+    <link rel="canonical" href="https://voidfile.vercel.app/">
+    <meta property="og:url" content="https://voidfile.vercel.app/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="VoidFile">
+    <meta property="og:title" content="VoidFile">
+    <meta property="og:description" content="Upload files completely anonymously, no registration required.">
+    <meta property="og:image" content="/assets/img/logo.png">
+    <link rel="icon" href="assets/img/logo.png" type="image/png">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="Upload files completely anonymously, no registration required.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --void-bg: #000000;
+            --void-text: #e2e2e5;
+            --void-primary: #ffffff;
+            --void-accent: #888888;
+            --void-border: #333333;
+            --glass-bg: rgba(5, 5, 5, 0.85);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--void-bg);
+            color: var(--void-text);
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .black-hole-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .black-hole {
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            background-color: #000;
+            border-radius: 50%;
+            box-shadow: 0 0 80px 15px rgba(255, 255, 255, 0.5), 0 0 150px 40px rgba(100, 100, 150, 0.2);
+            animation: pulse-hole 4s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulse-hole {
+            0% {
+                box-shadow: 0 0 70px 12px rgba(255, 255, 255, 0.4), 0 0 120px 30px rgba(100, 100, 150, 0.1);
+                transform: scale(0.98);
+            }
+
+            100% {
+                box-shadow: 0 0 100px 20px rgba(255, 255, 255, 0.6), 0 0 200px 50px rgba(100, 100, 150, 0.3);
+                transform: scale(1.02);
+            }
+        }
+
+
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 90%;
+            max-width: 290px;
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--void-border);
+            border-radius: 18px;
+            padding: 1.5rem 1.25rem;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            font-weight: 300;
+            color: #a0a0b8;
+            font-size: 0.85rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .file-drop-area {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 1rem;
+            border: 1px dashed #444;
+            border-radius: 10px;
+            background-color: #0a0a0a;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+        }
+
+        .file-drop-area:hover,
+        .file-drop-area.dragover {
+            border-color: #ffffff;
+            background-color: #151515;
+            transform: translateY(-2px);
+        }
+
+        .file-drop-area svg {
+            width: 42px;
+            height: 42px;
+            fill: #707080;
+            margin-bottom: 0.8rem;
+            transition: fill 0.3s ease;
+        }
+
+        .file-drop-area:hover svg,
+        .file-drop-area.dragover svg {
+            fill: var(--void-primary);
+        }
+
+        .file-msg {
+            font-size: 0.85rem;
+            color: #a0a0b8;
+            font-weight: 400;
+            word-break: break-all;
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .controls-row label {
+            font-size: 0.75rem;
+            color: #b0b0c5;
+            font-weight: 300;
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            background: rgba(10, 10, 10, 0.5);
+            color: white;
+            border: 1px solid var(--void-border);
+            padding: 0.5rem 1.8rem 0.5rem 0.8rem;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.75rem;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        select:focus,
+        select:hover {
+            border-color: var(--void-primary);
+            background: rgba(20, 20, 20, 0.6);
+        }
+
+        select option {
+            background-color: #000000;
+            color: white;
+        }
+
+        .select-wrapper::after {
+            content: "▼";
+            position: absolute;
+            right: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.6rem;
+            color: #a0a0b8;
+            pointer-events: none;
+            transition: color 0.3s ease;
+        }
+
+        select:hover+.select-wrapper::after {
+            color: white;
+        }
+
+        .input-wrapper {
+            width: 100%;
+            position: relative;
+            margin-top: 0.5rem;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            background: rgba(10, 10, 10, 0.5);
+            color: white;
+            border: 1px solid var(--void-border);
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-wrapper input::placeholder {
+            color: #606075;
+        }
+
+        .input-wrapper input:focus {
+            border-color: #ffffff;
+            background: rgba(20, 20, 20, 0.6);
+        }
+
+        .upload-btn {
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.2rem;
+            width: 100%;
+        }
+
+        .upload-btn:hover {
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            background-color: #eeeeee;
+        }
+
+        .upload-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+
+        .social-icon {
+            color: #a0a0b8;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+
+        .social-icon:hover {
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #606075;
+            z-index: 1;
+            font-weight: 300;
+            animation: fadeIn 1s ease-out 0.3s forwards;
+            opacity: 0;
+        }
+
+        .footer .heart {
+            color: var(--void-accent);
+            display: inline-block;
+            animation: pulse 1.8s infinite;
+            margin: 0 0.2rem;
+        }
+
+        .footer a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .footer a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .container {
+                padding: 1.5rem 1rem;
+            }
+
+            .controls-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="black-hole-container">
+        <div class="black-hole"></div>
+    </div>
+
+    <main class="container">
+        <header class="header">
+            <h1>VoidFile</h1>
+            <p>Anonymously upload files with ease.</p>
+        </header>
+
+        <section class="upload-section">
+            <div class="file-drop-area" id="fileDropArea">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path
+                        d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
+                </svg>
+                <div class="file-msg" id="fileMsg">Drop or click to choose a file</div>
+                <div class="file-msg" style="font-size: 0.70rem; margin-top: 0.4rem; opacity: 0.6;">Maximum of 2GB</div>
+                <input class="file-input" type="file" id="fileInput">
+            </div>
+
+            <div class="controls-row">
+                <label for="expiration">Expires after:</label>
+                <div class="select-wrapper">
+                    <select id="expiration" name="expiration">
+                        <option value="1h">1 Hour</option>
+                        <option value="6h">6 Hours</option>
+                        <option value="12h">12 Hours</option>
+                        <option value="1d" selected>1 Day</option>
+                        <option value="3d">3 Days</option>
+                        <option value="7d">1 Week</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-wrapper">
+                <input type="password" id="filePassword" placeholder="Password protection (optional)"
+                    autocomplete="new-password">
+            </div>
+
+            <button class="upload-btn" id="uploadBtn">Upload File</button>
+            <div class="social-links">
+                <a href="https://github.com/firstdecree/voidfile" target="_blank" rel="noopener noreferrer"
+                    class="social-icon" title="View Source on GitHub">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                        fill="currentColor">
+                        <path
+                            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        Made with <span class="heart">❤️</span> by <a href="https://firstdecree.org/" target="_blank"
+            rel="noopener noreferrer">The First Decree</a>
+    </footer>
+
+    <script>
+        const fileInput = document.getElementById("fileInput")
+        const fileMsg = document.getElementById("fileMsg")
+        const fileDropArea = document.getElementById("fileDropArea")
+        const uploadBtn = document.getElementById("uploadBtn")
+
+        fileInput.addEventListener("change", (e) => {
+            if (e.target.files.length > 0) {
+                fileMsg.textContent = e.target.files[0].name
+                fileMsg.style.color = "white"
+            } else {
+                fileMsg.textContent = "Drop or click to choose a file"
+                fileMsg.style.color = "#a0a0b8"
+            }
+        })
+
+        ;["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
+            fileDropArea.addEventListener(eventName, preventDefaults, false)
+        })
+
+        function preventDefaults(e) {
+            e.preventDefault()
+            e.stopPropagation()
+        }
+
+        ;["dragenter", "dragover"].forEach(eventName => {
+            fileDropArea.addEventListener(eventName, () => {
+                fileDropArea.classList.add("dragover")
+            }, false)
+        })
+
+        ;["dragleave", "drop"].forEach(eventName => {
+            fileDropArea.addEventListener(eventName, () => {
+                fileDropArea.classList.remove("dragover")
+            }, false)
+        })
+
+        fileDropArea.addEventListener("drop", (e) => {
+            let dt = e.dataTransfer
+            let files = dt.files
+
+            if (files.length > 0) {
+                fileInput.files = files
+                fileMsg.textContent = files[0].name
+                fileMsg.style.color = "white"
+            }
+        })
+
+        uploadBtn.addEventListener("click", () => {
+            // Variables
+            const files = fileInput.files
+            const expiration = document.getElementById("expiration").value
+            const password = document.getElementById("filePassword").value
+
+            // Validations
+            if (files.length === 0) {
+                alert("Please select a file to upload first.")
+                return
+            }
+
+            if (files[0].size > 2 * 1024 * 1024 * 1024) {
+                alert("File is too large! Maximum of 2GB.")
+                return
+            }
+
+            // Core
+            uploadBtn.textContent = "Uploading..."
+            uploadBtn.style.opacity = "0.8"
+            uploadBtn.style.cursor = "wait"
+
+            const formData = new FormData()
+            formData.append("file", files[0])
+            formData.append("expiration", expiration)
+            if (password) formData.append("password", password)
+
+            fetch("/api/upload", {
+                method: "POST",
+                body: formData
+            }).then(res => res.json())
+            .then(data => {
+                if (data.status) {
+                    alert("Upload Error: " + data.message)
+                } else {
+                    let fileUrl = window.location.origin + "/f/" + data.id
+                    if (password) {
+                        fileUrl += "?p=" + encodeURIComponent(password)
+                    }
+
+                    // Simple prompt to copy the file link
+                    prompt(`File successfully uploaded and encrypted, it will expire at ${new Date(data.expiration).toLocaleString()}).\nCopy your secure link below:`, fileUrl)
+                }
+            })
+            .catch(() => {
+                alert("Files cannot exceed 2GB limit.")
+            })
+            .finally(() => {
+                uploadBtn.textContent = "Upload File"
+                uploadBtn.style.opacity = "1"
+                uploadBtn.style.cursor = "pointer"
+
+                fileInput.value = ""
+                document.getElementById("filePassword").value = ""
+                fileMsg.textContent = "Drop or click to choose a file."
+                fileMsg.style.color = "#a0a0b8"
+            })
+        })
+    </script>
+</body>
+
+</html>

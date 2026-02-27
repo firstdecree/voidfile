@@ -1,0 +1,7 @@
+[web]
+port = 8080 # The port on where it will listen.
+
+[database] # MongoDB
+clusterURL = "" # The database cluster URI.
+databaseName = "main1" # The name of the database where the collections reside.
+filesCollectionName = "voidfile" # The collection name where files are stored (GridFS).

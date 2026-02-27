@@ -1,0 +1,20 @@
+{
+  "name": "voidfile",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "The First Decree",
+  "packageManager": "pnpm@10.19.0",
+  "dependencies": {
+    "axios": "^1.13.4",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "mongodb": "^7.1.0",
+    "multer": "^2.0.2",
+    "smol-toml": "^1.6.0"
+  }
+}
