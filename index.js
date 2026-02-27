@@ -43,7 +43,7 @@
     }, 60 * 1000)
 
     // Main
-    web.use(express.static(path.join((__dirname, "public"))))
+    web.use(express.static(path.join((__dirname, "public")), { extensions: ["html"] }))
     web.get("/api/render-image", async (req, res) => {
         // Variables
         const imageUrl = req.query.u
