@@ -4,10 +4,12 @@
     // Dependencies
     const client = await require("./modules/mongodb.js")
     const { GridFSBucket } = require("mongodb")
+    const compression = require("compression")
     const { parse } = require("smol-toml")
     const express = require("express")
     const multer = require("multer")
     const crypto = require("crypto")
+    const helmet = require("helmet")
     const axios = require("axios")
     const path = require("path")
     const fs = require("fs")
@@ -30,17 +32,20 @@
     const database = client.db(config.database.databaseName)
     const bucket = new GridFSBucket(database, { bucketName: config.database.filesCollectionName })
 
-    setInterval(async () => {
+    setInterval(async()=>{
         try {
             const filesColl = database.collection(config.database.filesCollectionName + ".files")
             const expiredFiles = await filesColl.find({ "metadata.expireAt": { $lt: new Date() } }).toArray()
-            for (const file of expiredFiles) {
-                await bucket.delete(file._id).catch(() => { })
-            }
-        } catch (err) {
+            for (const file of expiredFiles) await bucket.delete(file._id).catch(()=>{ })
+        }catch(err){
             console.log(`Error at GridFS files clean up: ${err.toSTring()}`)
         }
     }, 60 * 1000)
+
+    // Configurations
+    //* Express
+    web.use(compression({ level: 1 }))
+    web.use(helmet({ contentSecurityPolicy: false }))
 
     // Main
     web.use(express.static(path.join((__dirname, "public")), { extensions: ["html"] }))
@@ -114,7 +119,7 @@
             const readStream = fs.createReadStream(req.file.path)
             readStream.pipe(cipher).pipe(uploadStream)
             uploadStream.on("error", () => {
-                fs.unlink(req.file.path, () => { })
+                fs.unlink(req.file.path, ()=>{})
                 if (!res.headersSent) res.json({
                     status: "failed",
                     message: "Failed to upload file."
@@ -127,11 +132,11 @@
                     { _id: dbId },
                     { $set: { "metadata.authTag": authTag } }
                 )
-                fs.unlink(req.file.path, () => { })
+                fs.unlink(req.file.path, ()=>{})
                 res.json({ id, expiration: expireAt })
             })
         }catch{
-            if (req.file) fs.unlink(req.file.path, () => { })
+            if (req.file) fs.unlink(req.file.path, ()=>{})
             if (!res.headersSent) res.json({
                 status: "failed",
                 message: "Failed to upload file."
@@ -168,13 +173,14 @@
             })
 
             // Core
-            var decMeta
-            try {
+            var decMeta;
+
+            try{
                 const metaDecipher = crypto.createDecipheriv("aes-256-gcm", key, meta.metaIv.buffer || meta.metaIv)
                 metaDecipher.setAuthTag(meta.metaAuthTag.buffer || meta.metaAuthTag)
                 const decMetaBuf = Buffer.concat([metaDecipher.update(meta.encMeta.buffer || meta.encMeta), metaDecipher.final()])
                 decMeta = JSON.parse(decMetaBuf.toString("utf8"))
-            } catch{
+            }catch{
                 return res.json({
                     status: "failed",
                     message: "Failed to decrypt secure metadata."
@@ -203,8 +209,7 @@
                 })
                 res.end()
             })
-
-        } catch{
+        }catch{
             if (!res.headersSent) res.json({
                 status: "failed",
                 message: "Internal server error."
