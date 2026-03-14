@@ -42,3 +42,7 @@ The only unencrypted fields are the upload date, expiration date, file length, a
         </td>
     </tr>
 </table>
+
+<div align="center">
+  <sub>This project is distributed under <a href="/LICENSE"><b>MIT License</b></a></sub>
+</div>
