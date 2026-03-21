@@ -1,3 +1,5 @@
+<div align="center"><img src="./screenshot.png"/></div>
+
 # VoidFile
 **Upload files completely anonymously, no registration required.**
 
@@ -32,7 +34,7 @@ Uploaded files are encrypted using AES-256-GCM with a SHA-256 hash. All of its p
 
 The only unencrypted fields are the upload date, expiration date, file length, and chunk size.
 
-# 🌟 Backers & Sponsors
+# 🌟 Sponsors
 <table border="1">
     <tr>
         <td style="text-align: center; padding: 10px;">
